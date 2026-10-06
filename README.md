@@ -1,5 +1,8 @@
 # codebuddy-cli-delegation
 
+![License: MIT-0](https://img.shields.io/badge/license-MIT--0-blue)
+![Skill](https://img.shields.io/badge/type-agent%20skill-8957e5)
+
 > 把大批量编码任务派给「**独立无头 CodeBuddy CLI**」执行的标准流程 —— 你只负责
 > **写清指令 → 控预算 → 收产物 → 独立验收**。
 
@@ -112,3 +115,12 @@ codebuddy-cli-delegation/
 | 覆盖平台 | Windows（Git Bash）、macOS、Linux |
 
 > 技能里所有带 ⚠️ 的结论都对应一次具体的翻车记录，不是理论推导。
+
+---
+
+## 许可
+
+**MIT-0（MIT No Attribution）** —— 全文见 [LICENSE](LICENSE)。
+
+意即：可自由使用、修改、分发、商用，**连版权声明与许可声明都不需要保留**，
+也不提供任何担保。全文与 SPDX 官方文本一致（仅替换了版权行）。
