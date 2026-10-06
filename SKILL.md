@@ -1,6 +1,6 @@
 ---
 name: codebuddy-cli-delegation
-description: 把大批量编码任务派给「独立无头 CodeBuddy CLI」执行的标准流程。CodeBuddy CLI 专用（非通用 CLI 技能）：干净环境启动（避免宿主注入环境变量导致 0 字节静默挂死）、指令预算与并行准入（四隔离 + 写集不相交）、模型与参数分配（模型由派发方指定，参数按阶段分配）、独立审计验收（对抗性探针 + 变异对照，不采信 CLI 自述）。含 21 个可用模型清单与厂商档位映射、启动器模板，全部结论基于 CodeBuddy CLI 2.156.0 实测。用于批量改造、批量补测试、批量文档回填、无人值守跑批次等前台会超时的大任务。触发词：用 CLI 派活、让 CLI 干一批、无人值守跑、交给 CLI 做、批量改造、批量补测试、前台会超时、代码审计外包、headless CLI、CodeBuddy CLI。
+description: 把大批量编码任务派给「独立无头 CodeBuddy CLI」执行的标准流程。CodeBuddy CLI 专用（非通用 CLI 技能）：干净环境启动（避免宿主注入环境变量导致 0 字节静默挂死）、指令预算与并行准入（四隔离 + 写集不相交）、模型与参数分配（模型由派发方指定，参数按阶段分配）、独立审计验收（对抗性探针 + 变异对照，不采信 CLI 自述）。含 21 个可用模型清单与厂商档位映射、启动器模板，全部结论基于 CodeBuddy CLI 2.156.0 实测。用于批量改造、批量补测试、批量文档回填、无人值守跑批次等前台会超时的大任务。触发词：用 CLI 派活、让 CLI 干一批、无人值守跑、交给 CLI 做、批量改造、批量补测试、前台会超时、代码审计外包、headless CLI、CodeBuddy CLI。英文关键词 / English keywords：delegate to headless CodeBuddy CLI, unattended batch run, batch refactor, batch test authoring, agent delegation audit, adversarial probe, mutation control, clean-env launcher, headless agent delegation.
 agent_created: true
 ---
 

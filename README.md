@@ -3,6 +3,19 @@
 ![License: MIT-0](https://img.shields.io/badge/license-MIT--0-blue)
 ![Skill](https://img.shields.io/badge/type-agent%20skill-8957e5)
 
+**English summary** — A reusable Agent Skill for delegating large batches of coding work to a
+standalone **headless CodeBuddy CLI** agent. It covers the clean-environment launcher (which
+strips host-injected environment variables that otherwise cause silent zero-byte hangs),
+instruction budgeting, parallelism admission rules (4-way isolation + disjoint write sets),
+per-stage parameter allocation, and independent audit & acceptance through adversarial probes
+and mutation controls — never trusting the agent's own report. All 21 supported models and every
+other claim are empirically verified against **CodeBuddy CLI 2.156.0**.
+
+*The skill body and the rest of this README are written in Chinese, the primary audience for
+CodeBuddy CLI. This summary exists so non-Chinese visitors can judge relevance in 30 seconds.*
+
+---
+
 > 把大批量编码任务派给「**独立无头 CodeBuddy CLI**」执行的标准流程 —— 你只负责
 > **写清指令 → 控预算 → 收产物 → 独立验收**。
 
