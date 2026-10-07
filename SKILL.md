@@ -90,6 +90,14 @@ Agent 宿主（WorkBuddy / VS Code 扩展 / 桌面端）向子进程注入的变
 #### 它做了什么
 
 1. **剥离宿主注入的环境变量**（§一那张表的两组 + 产品身份 + 会话标识）
+   > **唯一例外**：`CODEBUDDY_CODE_GIT_BASH_PATH` 不剥 —— 它是「指向一个 bash 可执行文件」的
+   > 路径提示，不含端口 / 配置目录 / 产品身份，正是下面第 2 条自己要设置的变量。
+   > 但**必须先过 `fs.existsSync`**：宿主给的路径真实存在才沿用（比重新探测更准），
+   > 陈旧 / 跨机复制来的失效路径一律丢弃，交给第 2 条自行探测。
+   > ⚠️ **判断与写入 MUST 落在同一个对象上**（都是 `cleanEnv`）。剥离改 `cleanEnv`、守卫却读
+   > `process.env`，会让「宿主给的」和「自己探测的」两个来源**同时落空** —— 这是本脚本修过的
+   > 一处真实 bug，症状诡异（宿主明明注入了有效路径，CLI 却报 `Git Bash not detected`），
+   > 详见 §「Git Bash 那条提示说明什么」。
 2. **Windows 上补 `CODEBUDDY_CODE_GIT_BASH_PATH`** —— 否则 CLI 会退化成 PowerShell；
    探测顺序：PATH 里的 `bash.exe` → 各盘 `Program Files\Git\bin\` → PATH 目录里任意 `bash.exe`
 3. **定位 CodeBuddy CLI** —— 扫 `PATH` 各目录找 `codebuddy`（Windows 上按 `PATHEXT`
@@ -168,11 +176,19 @@ for (const dir of (process.env.PATH || '').split(path.delimiter)) {
 若 stderr 出现 `Git Bash not detected`，说明脚本**没能**给 `CODEBUDDY_CODE_GIT_BASH_PATH`
 指到可执行文件。按序自查：
 
+1. **宿主是否已经注入过这个变量？** 若是，先确认启动器是「**校验过存在性再沿用**」而不是
+   「直接信任」，更要确认**守卫读的是哪个对象** —— 最常见的一类 bug 是：剥离改的是 `cleanEnv`，
+   判断却读 `process.env` ⇒ 宿主注入了有效路径时整块探测被跳过，而该变量又已被剥掉，
+   **两个来源同时落空**，看起来完全不像配置错误。
+   通用诊断：调用前 `unset CODEBUDDY_CODE_GIT_BASH_PATH` 再跑，可区分「问题出在宿主给的路径」
+   还是「出在探测逻辑」。
+2. **逐条打印 PATH，看是哪一步没命中**：
+
 ```js
 // 逐条打印，看是哪一步没命中
 process.env.PATH.split(path.delimiter).forEach(d => console.log(d));
-// 手动确认目标存在
-console.log(fs.existsSync('D:\\Program Files\\Git\\bin\\bash.exe'));
+// 手动确认目标存在（把路径换成你机器上的安装位置）
+console.log(fs.existsSync('<Git 安装根>\\bin\\bash.exe'));
 ```
 
 也可能是 Git Bash 确实没装（此时装一个即可，或确认退化成 PowerShell 对你的任务无影响——
@@ -190,7 +206,7 @@ console.log(fs.existsSync('D:\\Program Files\\Git\\bin\\bash.exe'));
 | ③ | `.ps1` | 加 UTF-8 BOM | 括号平衡 | ✅ 通过（用户实跑确认） |
 | ④ | `.js` | 改用 `where` 定位 CLI | `node --check` 通过 | **`error=EBUSY`** —— 进程派生被宿主安全策略拦，定位恒失败 |
 | ⑤ | `.js` | 改用纯 `fs` 扫 PATH | 语法通过 | ✅ 通过 |
-| ⑥ | `.js` | 补 D 盘 Git Bash 探测 | 语法通过 | 探测命中 `D:\Program Files\Git\bin\bash.exe`，**但未能验证 CLI 是否接受**（沙箱无法执行 bash） |
+| ⑥ | `.js` | 补「各盘 `Program Files`」Git Bash 探测 | 语法通过 | 实测命中 Windows 上的 Git Bash，**但未能验证 CLI 是否接受**（沙箱无法执行 bash） |
 | ⑦ | `.js` | 从 `.ps1` 版切换过来 | `node --check` 通过 | **`error: unknown option '-Prompt'`** —— `.ps1` 有具名参数、`.js` 是纯透传，**两版接口不一致** |
 
 **⑦的性质与前六轮不同**：前六轮是"环境里的坑"，⑦是**我自己制造的接口不一致** ——

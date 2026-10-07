@@ -50,18 +50,32 @@ const EXACT = [
   'CODEBUDDY_TOOL_CALL_ID',
 ];
 
+// 剥离规则的唯一例外：这是「指向一个 bash 可执行文件」的路径提示，不含端口 / 配置目录 /
+// 产品身份，正是本脚本在 ② 里自己要设置的变量。宿主若已给了**真实存在**的路径，直接沿用
+// （比重新探测更准 —— 便携版 Git / 用户目录自装 / conda 环境这类非标准位置探测不到）；
+// 不存在（陈旧、或从别的机器复制来的）则丢弃，交给 ② 自行探测。
+const KEEP_IF_EXISTS = 'CODEBUDDY_CODE_GIT_BASH_PATH';
+
 const cleanEnv = Object.assign({}, process.env);
 for (const key of Object.keys(cleanEnv)) {
+  if (key === KEEP_IF_EXISTS) continue;
   if (PREFIXES.some((p) => key.startsWith(p)) || EXACT.includes(key)) {
     delete cleanEnv[key];
   }
+}
+// 例外变量仍须过存在性校验：只有「CLI 真能用上」的才留
+if (cleanEnv[KEEP_IF_EXISTS] && !fs.existsSync(cleanEnv[KEEP_IF_EXISTS])) {
+  delete cleanEnv[KEEP_IF_EXISTS];
 }
 
 // ── ② Windows：让 CLI 走 Git Bash 而不是退化成 PowerShell ──────────────
 // 策略：① PATH 里找 bash.exe（最稳，装在哪都命中）
 //       ② 兜底扫几个常见的 Git for Windows 安装根（含非 C 盘）
 // 注意：不能只试 C:\Program Files —— 实测存在装在 D 盘等其它盘符的机器。
-if (process.platform === 'win32' && !process.env.CODEBUDDY_CODE_GIT_BASH_PATH) {
+// ⚠️ 守卫 MUST 与上面 ① 操作**同一个对象**（cleanEnv）。历史 bug：剥离改的是 cleanEnv，
+//    守卫却读 process.env ⇒ 宿主已注入该变量时整块探测被跳过，而该变量又已被剥离，
+//    两个来源同时落空 ⇒ CLI 只能自行探测并失败 → stderr 提示 Git Bash not detected。
+if (process.platform === 'win32' && !cleanEnv.CODEBUDDY_CODE_GIT_BASH_PATH) {
   const isWinBash = (p) => /[\\/]bash\.exe$/i.test(p);
 
   // ① 先扫 PATH（纯 fs 操作，无进程派生）
