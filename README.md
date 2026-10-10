@@ -22,7 +22,7 @@ CodeBuddy CLI. This summary exists so non-Chinese visitors can judge relevance i
 **它解决什么**：前台同步做会超时 / 上下文会被撑爆 / 需要并行多批次的大活。
 **它不解决什么**：需要人来拍板的决策、需要访问宿主私有状态的事、一次性的小改动。
 
-这是一个 **Agent Skill**（技能包），核心是一份 866 行的 `SKILL.md` 加一个跨平台启动器脚本。
+这是一个 **Agent Skill**（技能包），核心是一份近千行的 `SKILL.md` 加一个跨平台启动器脚本。
 全部结论基于 **CodeBuddy CLI 2.156.0**（2026-10-06）实测，不含任何未验证的推测。
 
 ---
@@ -64,7 +64,7 @@ Windows 下目标路径形如 `C:\Users\<你>\.codebuddy\skills\codebuddy-cli-de
 
 ```
 codebuddy-cli-delegation/
-├── SKILL.md                      # 技能主体：十条正文 + 四条铁律 + 检查清单
+├── SKILL.md                      # 技能主体：导读 + 四条铁律 + 十条正文 + 检查清单
 ├── scripts/
 │   └── codebuddy-cli.js          # 干净环境启动器（单文件，Windows/macOS/Linux 通用）
 └── skills-bootstrap.template.md  # 注入 CLI system prompt 的技能约定模板
@@ -91,7 +91,10 @@ codebuddy-cli-delegation/
 
 | 节 | 内容 |
 |---|---|
+| 导读 | **30 秒按目的找章节**（第一次用走这里） |
 | 零 | 四条铁律 |
+| 零之二 | **端到端最小路径**：从零到跑完一批（9 步闭环） |
+| 零之三 | **症状索引（FAQ）**：高频故障的统一入口 |
 | 一 | 为什么需要干净环境启动器 · 启动器实现 · 七轮翻车复盘 · **21 个模型可用性事实表** |
 | 二 | 并行与串行：准入、四隔离、分工与合并审计纪律 |
 | 三 | **写指令**（成败关键）：提技能 ≠ 加载技能、喂结论、硬性预算、失败标准动作、派发前契约核对六动作 |
